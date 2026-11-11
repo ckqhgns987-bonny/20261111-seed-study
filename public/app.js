@@ -9,7 +9,7 @@
 // 4. 3단계 식물 성장 시각화 (0~33% 씨앗, 34~66% 새싹, 67%~ 꽃피우기)
 // 5. 성장 스토리 초기화 (새 씨앗으로 리셋하여 다음 공부에도 적용 가능)
 // 6. 비로그인 피드백 작성/조회 및 OpenAI 감성 응원 한마디 연동
-// 7. 사용자 오류 토스트 안내창 표시
+// 7. 사용자 오류 토스트 안내창 표시 및 API 방어 로직
 // ==============================================================================
 
 // ==============================================================================
@@ -66,7 +66,7 @@ const DOM = {
     growthProgressFill: document.getElementById('growth-progress-fill'),
     summaryAccumulated: document.getElementById('summary-accumulated'),
     summaryRemaining: document.getElementById('summary-remaining'),
-    btnResetGrowth: document.getElementById('btn-reset-growth'), // [신규] 성장 초기화 버튼
+    btnResetGrowth: document.getElementById('btn-reset-growth'),
 
     // 피드백 폼 & 목록 요소
     feedbackForm: document.getElementById('feedback-form'),
@@ -233,7 +233,7 @@ async function addManualStudyTime(minutesToAdd) {
 }
 
 // ==============================================================================
-// 7. [신규 기능] 성장 스토리 초기화 (새로운 씨앗 심기)
+// 7. 성장 스토리 초기화 (새로운 씨앗 심기)
 // ==============================================================================
 /**
  * 꽃을 다 피웠거나 새로운 공부 세션을 시작할 때, 누적 공부시간을 0으로 리셋합니다.
@@ -353,7 +353,7 @@ function switchTimerMode(newMode) {
 }
 
 // ==============================================================================
-// 9. 피드백 CRUD 및 OpenAI 응원 연동 로직
+// 9. 피드백 CRUD 및 OpenAI 응원 연동 로직 (방어 파싱 강화)
 // ==============================================================================
 /**
  * 최신순 피드백 목록을 서버에서 불러와 화면에 렌더링합니다.
@@ -363,7 +363,14 @@ async function loadFeedbacks() {
 
     try {
         const response = await fetch('/api/feedbacks');
-        const result = await response.json();
+        const rawText = await response.text();
+
+        let result;
+        try {
+            result = JSON.parse(rawText);
+        } catch (e) {
+            throw new Error('서버 응답 오류 (404/500): Vercel 환경 변수 설정을 확인해 주세요.');
+        }
 
         if (!response.ok || !result.success) {
             throw new Error(result.message || '피드백을 불러오지 못했습니다.');
@@ -405,7 +412,7 @@ async function loadFeedbacks() {
 
     } catch (err) {
         console.error('[피드백 로드 오류]:', err);
-        DOM.feedbackList.innerHTML = `<div class="empty-state" style="color: #D9534F;">⚠️ 피드백을 불러올 수 없습니다. (.env 설정 확인 필요)</div>`;
+        DOM.feedbackList.innerHTML = `<div class="empty-state" style="color: #D9534F;">⚠️ 피드백을 불러올 수 없습니다: ${err.message}</div>`;
     }
 }
 
@@ -437,9 +444,14 @@ async function handleFeedbackSubmit(event) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: content })
             });
-            const aiResult = await aiResponse.json();
-            if (aiResult.success) {
-                aiCheer = aiResult.cheer;
+            const aiRaw = await aiResponse.text();
+            try {
+                const aiResult = JSON.parse(aiRaw);
+                if (aiResult.success) {
+                    aiCheer = aiResult.cheer;
+                }
+            } catch (jsonErr) {
+                console.warn('[AI 응원 응답 파싱 실패]:', aiRaw);
             }
         } catch (aiErr) {
             console.warn('[AI 응원 생성 건너뜀]:', aiErr.message);
@@ -456,7 +468,13 @@ async function handleFeedbackSubmit(event) {
             })
         });
 
-        const saveResult = await saveResponse.json();
+        const saveRaw = await saveResponse.text();
+        let saveResult;
+        try {
+            saveResult = JSON.parse(saveRaw);
+        } catch (e) {
+            throw new Error('서버 통신 실패 (404/500 HTML 응답): Vercel 환경 설정을 확인해 주세요.');
+        }
 
         if (!saveResponse.ok || !saveResult.success) {
             throw new Error(saveResult.message || '피드백 저장에 실패했습니다.');
@@ -561,7 +579,7 @@ function initEventListeners() {
         });
     });
 
-    // [신규] 성장 스토리 초기화 버튼 이벤트 연결
+    // 성장 스토리 초기화 버튼 이벤트 연결
     if (DOM.btnResetGrowth) {
         DOM.btnResetGrowth.addEventListener('click', resetGrowthStory);
     }

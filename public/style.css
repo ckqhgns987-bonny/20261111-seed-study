@@ -781,6 +781,30 @@ body {
     100% { transform: scale(1.08); filter: drop-shadow(0 8px 20px rgba(232, 165, 165, 0.8)); }
 }
 
+/* ===== 4단계: 열매(Fruit) 테마 스타일 ===== */
+/* 열매 단계의 카드 배경색 — 따뜻한 주황/오렌지 그라데이션 */
+.fruit-theme {
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+    border: 3px solid #FF8C00;
+}
+
+/* 열매 이모지 반짝이는 애니메이션 — 황금빛 글로우 효과 */
+.fruit-glow {
+    animation: fruitPulse 2.5s infinite alternate ease-in-out;
+}
+
+/* 열매 단계 도달 시 🍎 이모지가 살랑살랑 반짝이는 keyframe */
+@keyframes fruitPulse {
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 4px 10px rgba(255, 140, 0, 0.4));
+    }
+    100% {
+        transform: scale(1.08);
+        filter: drop-shadow(0 8px 20px rgba(255, 140, 0, 0.9));
+    }
+}
+
 .stage-description {
     font-size: 0.92rem;
     color: var(--text-muted);

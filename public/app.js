@@ -7,7 +7,7 @@
 // 2. [물뿌리개 감성 인터랙션] 타이머 실행 시 물뿌리개가 기울어지며 물방울(단비)을 주는 애니메이션
 // 3. 사용자가 직접 입력하는 공부시간 수동 누적 기능 (타이머 자동 합산 제거)
 // 4. 일일 목표 공부시간 설정 및 누적 시간 합산
-// 5. 3단계 식물 성장 시각화 (0~33% 씨앗, 34~66% 새싹, 67%~ 꽃피우기)
+// 5. 4단계 식물 성장 시각화 (0~24% 씨앗, 25~49% 새싹, 50~74% 꽃피우기, 75%~ 열매)
 // 6. 성장 스토리 초기화 (새 씨앗으로 리셋하여 다음 공부에도 적용 가능)
 // 7. 비로그인 피드백 작성/조회 및 OpenAI 감성 응원 한마디 연동
 // 8. 사용자 오류 토스트 안내창 표시 및 API 방어 로직
@@ -28,7 +28,7 @@ const STATE = {
     // 목표 및 성장 관련 상태
     goalHours: 4.0,           // 일일 목표 공부시간 (시간 단위)
     accumulatedMinutes: 0,    // 오늘 누적한 공부시간 (분 단위)
-    currentStage: 1           // 1: 씨앗(Seed), 2: 새싹(Sprout), 3: 꽃(Bloom)
+    currentStage: 1           // 1: 씨앗(Seed), 2: 새싹(Sprout), 3: 꽃(Bloom), 4: 열매(Fruit)
 };
 
 // ==============================================================================
@@ -60,11 +60,12 @@ const DOM = {
     heroTodayDisplay: document.getElementById('hero-today-display'),
     heroStageDisplay: document.getElementById('hero-stage-display'),
 
-    // 성장 시각화 요소
+    // 성장 시각화 요소 (4단계: 씨앗/새싹/꽃/열매)
     growthStageBadge: document.getElementById('growth-stage-badge'),
     stageSeed: document.getElementById('stage-seed'),
     stageSprout: document.getElementById('stage-sprout'),
     stageBloom: document.getElementById('stage-bloom'),
+    stageFruit: document.getElementById('stage-fruit'),  // 4단계 열매 요소 추가
     growthPercentText: document.getElementById('growth-percent-text'),
     growthProgressFill: document.getElementById('growth-progress-fill'),
     summaryAccumulated: document.getElementById('summary-accumulated'),
@@ -140,7 +141,7 @@ function renderTimer() {
 // 5. 식물 3단계 성장 시각화 계산 & 렌더링
 // ==============================================================================
 /**
- * 목표 대비 달성률을 계산하고 씨앗/새싹/꽃 단계를 화면에 반영합니다.
+ * 목표 대비 달성률을 계산하고 씨앗/새싹/꽃/열매 4단계를 화면에 반영합니다.
  */
 function updateGrowthDisplay() {
     // 목표 시간을 분 단위로 환산
@@ -153,29 +154,43 @@ function updateGrowthDisplay() {
     DOM.growthPercentText.textContent = `${percentage}%`;
     DOM.growthProgressFill.style.width = `${percentage}%`;
 
-    // 3단계 식물 성장 판정 (PRD 기준)
-    // 1단계 (0 ~ 33%): 씨앗 (Seed) 🌱
-    // 2단계 (34 ~ 66%): 새싹 (Sprout) 🌿
-    // 3단계 (67 ~ 100% 이상): 꽃피우기 (Bloom) 🌸
+    // ----------------------------------------------------------------
+    // 4단계 식물 성장 판정 (목표 대비 달성률 기준)
+    // 1단계 (0 ~ 24%):   씨앗 (Seed) 🌱
+    // 2단계 (25 ~ 49%):  새싹 (Sprout) 🌿
+    // 3단계 (50 ~ 74%):  꽃피우기 (Bloom) 🌸
+    // 4단계 (75 ~ 100%): 열매 맺기 (Fruit) 🍎
+    // ----------------------------------------------------------------
+
+    // 이전 단계 CSS 클래스 모두 제거 (깔끔하게 초기화)
     DOM.stageSeed.classList.remove('active');
     DOM.stageSprout.classList.remove('active');
     DOM.stageBloom.classList.remove('active');
+    DOM.stageFruit.classList.remove('active');   // 4단계 열매도 함께 초기화
 
     let stageName = '';
     let stageNumber = 1;
 
-    if (percentage < 34) {
+    if (percentage < 25) {
+        // 🌱 1단계: 씨앗 — 아직 땅속에서 기운을 모으는 단계
         stageNumber = 1;
         stageName = '1단계: 씨앗 (Seed) 🌱';
         DOM.stageSeed.classList.add('active');
-    } else if (percentage < 67) {
+    } else if (percentage < 50) {
+        // 🌿 2단계: 새싹 — 목표의 25%를 넘어 움이 트는 단계
         stageNumber = 2;
         stageName = '2단계: 새싹 (Sprout) 🌿';
         DOM.stageSprout.classList.add('active');
-    } else {
+    } else if (percentage < 75) {
+        // 🌸 3단계: 꽃 — 목표의 절반을 넘어 꽃이 피어나는 단계
         stageNumber = 3;
         stageName = '3단계: 꽃피우기 (Bloom) 🌸';
         DOM.stageBloom.classList.add('active');
+    } else {
+        // 🍎 4단계: 열매 — 목표의 75% 이상 달성! 풍성한 결실
+        stageNumber = 4;
+        stageName = '4단계: 열매 맺기 (Fruit) 🍎';
+        DOM.stageFruit.classList.add('active');
     }
 
     STATE.currentStage = stageNumber;

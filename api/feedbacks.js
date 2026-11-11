@@ -1,40 +1,58 @@
 // ==============================================================================
 // [api/feedbacks.js - 피드백 조회 및 저장 API]
-// 이 파일은 사용자가 남긴 피드백을 Supabase 데이터베이스에 저장하거나,
-// 저장된 피드백 목록을 최신순으로 가져오는 백엔드 API입니다.
+// 로컬 Express 서버 및 Vercel Serverless Functions 양쪽 환경에서 모두 완벽히 동작합니다.
 // ==============================================================================
 
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
-// Supabase 접속 정보 환경 변수 불러오기
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+/**
+ * 안전한 Supabase 클라이언트 생성 함수
+ */
+function getSupabaseClient() {
+    const rawUrl = process.env.SUPABASE_URL;
+    const rawKey = process.env.SUPABASE_ANON_KEY;
 
-// Supabase 클라이언트 객체 생성 (URL과 Anon Key가 입력되었을 때만 생성)
-let supabase = null;
-if (supabaseUrl && supabaseAnonKey && !supabaseUrl.includes('your_supabase_url')) {
-    supabase = createClient(supabaseUrl, supabaseAnonKey);
+    if (!rawUrl || !rawKey) return null;
+
+    const url = rawUrl.trim();
+    const key = rawKey.trim();
+
+    if (url.includes('your_supabase_url') || key.includes('your_supabase_anon_key')) {
+        return null;
+    }
+
+    return createClient(url, key);
 }
 
 /**
- * 피드백 관련 요청을 처리하는 핸들러 함수
- * @param {import('express').Request} req - 클라이언트 요청 객체
- * @param {import('express').Response} res - 클라이언트 응답 객체
+ * 피드백 관련 요청을 처리하는 메인 핸들러
  */
 async function feedbacksHandler(req, res) {
+    // CORS 헤더 설정 (Vercel Serverless Function 대응)
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    const supabase = getSupabaseClient();
+
     // 1. Supabase 연동 정보가 설정되어 있는지 검증
     if (!supabase) {
         return res.status(500).json({
             success: false,
-            message: 'Supabase 환경 변수(SUPABASE_URL, SUPABASE_ANON_KEY)가 올바르게 설정되지 않았습니다. .env 파일을 확인해 주세요.'
+            message: 'Vercel 환경 변수(SUPABASE_URL, SUPABASE_ANON_KEY)가 설정되지 않았습니다. Vercel 대시보드에서 Environment Variables를 등록해 주세요.'
         });
     }
 
     // 2. GET 요청: 최신순 피드백 목록 조회
     if (req.method === 'GET') {
         try {
-            // feedbacks 테이블에서 최신 작성일자(created_at) 순으로 정렬하여 조회
             const { data, error } = await supabase
                 .from('feedbacks')
                 .select('*')
@@ -56,7 +74,7 @@ async function feedbacksHandler(req, res) {
             console.error('[서버 내부 에러]:', err);
             return res.status(500).json({
                 success: false,
-                message: '서버 내부 오류가 발생했습니다.'
+                message: '서버 내부 오류가 발생했습니다: ' + err.message
             });
         }
     }
@@ -64,9 +82,20 @@ async function feedbacksHandler(req, res) {
     // 3. POST 요청: 새로운 피드백 등록
     if (req.method === 'POST') {
         try {
-            const { nickname, content, ai_cheer } = req.body;
+            // Vercel Serverless의 경우 body가 string일 수 있으므로 파싱 처리
+            let body = req.body;
+            if (typeof body === 'string') {
+                try {
+                    body = JSON.parse(body);
+                } catch (e) {
+                    body = {};
+                }
+            }
+            body = body || {};
 
-            // 필수값 검증: 피드백 내용(content)이 비어있는지 확인
+            const { nickname, content, ai_cheer } = body;
+
+            // 필수값 검증
             if (!content || !content.trim()) {
                 return res.status(400).json({
                     success: false,
@@ -74,10 +103,8 @@ async function feedbacksHandler(req, res) {
                 });
             }
 
-            // 닉네임 기본값 처리 (입력하지 않으면 '익명')
             const finalNickname = (nickname && nickname.trim()) ? nickname.trim() : '익명';
 
-            // 데이터베이스에 삽입할 레코드 객체
             const insertPayload = {
                 nickname: finalNickname,
                 content: content.trim(),
@@ -106,12 +133,11 @@ async function feedbacksHandler(req, res) {
             console.error('[서버 내부 에러]:', err);
             return res.status(500).json({
                 success: false,
-                message: '서버 내부 오류가 발생했습니다.'
+                message: '서버 내부 오류가 발생했습니다: ' + err.message
             });
         }
     }
 
-    // 지원하지 않는 HTTP 메소드 예외 처리
     return res.status(405).json({
         success: false,
         message: '지원하지 않는 HTTP 메소드입니다.'
@@ -119,4 +145,3 @@ async function feedbacksHandler(req, res) {
 }
 
 module.exports = feedbacksHandler;
-

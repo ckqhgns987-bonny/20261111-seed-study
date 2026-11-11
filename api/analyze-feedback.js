@@ -1,27 +1,31 @@
 // ==============================================================================
 // [api/analyze-feedback.js - OpenAI 기반 감성 응원 한마디 생성 API]
-// 이 파일은 사용자가 작성한 소감이나 피드백을 읽고,
-// OpenAI gpt-4o-mini 모델을 통해 따뜻한 응원의 한마디를 만들어주는 백엔드 API입니다.
+// 로컬 Express 및 Vercel Serverless Functions 양쪽 환경에서 모두 완벽히 동작합니다.
 // ==============================================================================
 
 const OpenAI = require('openai');
 require('dotenv').config();
 
-// OpenAI API 키 환경 변수 불러오기
-const apiKey = process.env.OPENAI_API_KEY;
-
-// OpenAI 클라이언트 초기화
-let openai = null;
-if (apiKey && !apiKey.includes('your_openai_api_key')) {
-    openai = new OpenAI({ apiKey: apiKey });
+function getOpenAIClient() {
+    const rawKey = process.env.OPENAI_API_KEY;
+    if (!rawKey) return null;
+    const apiKey = rawKey.trim();
+    if (apiKey.includes('your_openai_api_key')) return null;
+    return new OpenAI({ apiKey: apiKey });
 }
 
-/**
- * OpenAI 감성 응원 메시지 생성 핸들러 함수
- * @param {import('express').Request} req - 요청 객체
- * @param {import('express').Response} res - 응답 객체
- */
 async function analyzeFeedbackHandler(req, res) {
+    // CORS 헤더 설정
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
     if (req.method !== 'POST') {
         return res.status(405).json({
             success: false,
@@ -29,16 +33,23 @@ async function analyzeFeedbackHandler(req, res) {
         });
     }
 
-    // OpenAI API 키 설정 여부 확인
+    const openai = getOpenAIClient();
+
     if (!openai) {
         return res.status(500).json({
             success: false,
-            message: 'OpenAI API 키가 설정되지 않았습니다. .env 파일의 OPENAI_API_KEY를 확인해 주세요.'
+            message: 'OpenAI API 키가 설정되지 않았습니다. Vercel 환경 변수(OPENAI_API_KEY)를 확인해 주세요.'
         });
     }
 
     try {
-        const { content } = req.body;
+        let body = req.body;
+        if (typeof body === 'string') {
+            try { body = JSON.parse(body); } catch (e) { body = {}; }
+        }
+        body = body || {};
+
+        const { content } = body;
 
         if (!content || !content.trim()) {
             return res.status(400).json({
@@ -47,7 +58,6 @@ async function analyzeFeedbackHandler(req, res) {
             });
         }
 
-        // OpenAI gpt-4o-mini 모델 호출
         const completion = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: [
@@ -80,4 +90,3 @@ async function analyzeFeedbackHandler(req, res) {
 }
 
 module.exports = analyzeFeedbackHandler;
-

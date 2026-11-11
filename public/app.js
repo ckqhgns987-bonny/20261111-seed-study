@@ -7,8 +7,9 @@
 // 2. 사용자가 직접 입력하는 공부시간 수동 누적 기능 (타이머 자동 합산 제거)
 // 3. 일일 목표 공부시간 설정 및 누적 시간 합산
 // 4. 3단계 식물 성장 시각화 (0~33% 씨앗, 34~66% 새싹, 67%~ 꽃피우기)
-// 5. 비로그인 피드백 작성/조회 및 OpenAI 감성 응원 한마디 연동
-// 6. 사용자 오류 토스트 안내창 표시
+// 5. 성장 스토리 초기화 (새 씨앗으로 리셋하여 다음 공부에도 적용 가능)
+// 6. 비로그인 피드백 작성/조회 및 OpenAI 감성 응원 한마디 연동
+// 7. 사용자 오류 토스트 안내창 표시
 // ==============================================================================
 
 // ==============================================================================
@@ -44,7 +45,7 @@ const DOM = {
     inputStudyMin: document.getElementById('input-study-min'),
     inputBreakMin: document.getElementById('input-break-min'),
 
-    // [신규] 수동 공부시간 추가 요소
+    // 수동 공부시간 추가 요소
     inputManualMinutes: document.getElementById('input-manual-minutes'),
     btnAddManualTime: document.getElementById('btn-add-manual-time'),
     quickChips: document.querySelectorAll('.chip-btn'),
@@ -65,6 +66,7 @@ const DOM = {
     growthProgressFill: document.getElementById('growth-progress-fill'),
     summaryAccumulated: document.getElementById('summary-accumulated'),
     summaryRemaining: document.getElementById('summary-remaining'),
+    btnResetGrowth: document.getElementById('btn-reset-growth'), // [신규] 성장 초기화 버튼
 
     // 피드백 폼 & 목록 요소
     feedbackForm: document.getElementById('feedback-form'),
@@ -194,7 +196,7 @@ function updateGrowthDisplay() {
 }
 
 // ==============================================================================
-// 6. [신규 기능] 사용자가 직접 공부시간을 기록하는 로직 (수동 추가)
+// 6. 사용자가 직접 공부시간을 기록하는 로직 (수동 추가)
 // ==============================================================================
 /**
  * 사용자가 입력한 분 단위 공부시간을 누적 시간에 수동으로 추가합니다.
@@ -231,7 +233,27 @@ async function addManualStudyTime(minutesToAdd) {
 }
 
 // ==============================================================================
-// 7. 뽀모도로 타이머 제어 함수들 (자동 합산 제거됨)
+// 7. [신규 기능] 성장 스토리 초기화 (새로운 씨앗 심기)
+// ==============================================================================
+/**
+ * 꽃을 다 피웠거나 새로운 공부 세션을 시작할 때, 누적 공부시간을 0으로 리셋합니다.
+ */
+function resetGrowthStory() {
+    const confirmed = confirm('오늘의 누적 공부시간을 초기화하고, 새로운 씨앗(1단계 🌱)부터 다시 키우시겠습니까?');
+    if (!confirmed) return;
+
+    // 상태값 0으로 초기화
+    STATE.accumulatedMinutes = 0;
+    localStorage.setItem('pomobloom_accumulated_mins', 0);
+
+    // 화면 갱신
+    updateGrowthDisplay();
+
+    showToast('🌱 새로운 씨앗을 심었습니다! 새로운 집중의 여정을 응원합니다.', 'success');
+}
+
+// ==============================================================================
+// 8. 뽀모도로 타이머 제어 함수들 (자동 합산 제거됨)
 // ==============================================================================
 /**
  * 타이머 카운트다운 시작
@@ -281,8 +303,7 @@ function resetTimer() {
 
 /**
  * 타이머 완료 처리:
- * [중요 변경사항]: 자동으로 공부시간을 합산하지 않고,
- * 사용자가 직접 [공부시간 기록하기]를 누르도록 친절하게 안내합니다.
+ * 자동으로 공부시간을 합산하지 않고, 사용자가 직접 수동 기록하도록 안내합니다.
  */
 function completeTimer() {
     clearInterval(STATE.timerInterval);
@@ -332,7 +353,7 @@ function switchTimerMode(newMode) {
 }
 
 // ==============================================================================
-// 8. 피드백 CRUD 및 OpenAI 응원 연동 로직
+// 9. 피드백 CRUD 및 OpenAI 응원 연동 로직
 // ==============================================================================
 /**
  * 최신순 피드백 목록을 서버에서 불러와 화면에 렌더링합니다.
@@ -472,7 +493,7 @@ function escapeHtml(str) {
 }
 
 // ==============================================================================
-// 9. 이벤트 리스너 등록 & 초기화 실행
+// 10. 이벤트 리스너 등록 & 초기화 실행
 // ==============================================================================
 function initEventListeners() {
     // 타이머 제어 버튼들
@@ -525,13 +546,13 @@ function initEventListeners() {
         showToast(`일일 목표가 ${val}시간으로 설정되었습니다.`, 'success');
     });
 
-    // [신규] 수동 공부시간 추가 버튼 이벤트
+    // 수동 공부시간 추가 버튼 이벤트
     DOM.btnAddManualTime.addEventListener('click', () => {
         const val = parseInt(DOM.inputManualMinutes.value, 10);
         addManualStudyTime(val);
     });
 
-    // [신규] 퀵 추가 칩 버튼 (+10분, +25분, +50분, +1시간) 이벤트
+    // 퀵 추가 칩 버튼 (+10분, +25분, +50분, +1시간) 이벤트
     DOM.quickChips.forEach(chip => {
         chip.addEventListener('click', () => {
             const min = parseInt(chip.dataset.min, 10);
@@ -539,6 +560,11 @@ function initEventListeners() {
             addManualStudyTime(min);
         });
     });
+
+    // [신규] 성장 스토리 초기화 버튼 이벤트 연결
+    if (DOM.btnResetGrowth) {
+        DOM.btnResetGrowth.addEventListener('click', resetGrowthStory);
+    }
 
     // 피드백 관련
     DOM.feedbackForm.addEventListener('submit', handleFeedbackSubmit);

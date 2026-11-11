@@ -125,7 +125,7 @@
                 </div>
 
                 <!-- ============================================================ -->
-                <!-- [신규 기능] 사용자가 직접 공부시간을 추가하는 영역 -->
+                <!-- [수동 공부시간 추가 영역] -->
                 <!-- ============================================================ -->
                 <div class="manual-record-wrap">
                     <div class="manual-record-header">
@@ -154,9 +154,15 @@
 
             <!-- 우측: 3단계 식물 성장 시각화 카드 (씨앗 -> 새싹 -> 꽃) -->
             <div class="card growth-card" id="growth-section">
-                <div class="card-header">
-                    <span class="card-tag">PLANT GROWTH</span>
-                    <h2 class="card-title">성장 스토리</h2>
+                <div class="card-header growth-header-row">
+                    <div>
+                        <span class="card-tag">PLANT GROWTH</span>
+                        <h2 class="card-title">성장 스토리</h2>
+                    </div>
+                    <!-- [신규 기능] 성장 스토리 초기화 버튼 -->
+                    <button type="button" class="btn-reset-growth" id="btn-reset-growth" title="오늘의 누적 시간을 초기화하고 새로운 씨앗부터 다시 시작합니다">
+                        🔄 새 씨앗으로 리셋
+                    </button>
                 </div>
 
                 <!-- 성장 그래픽 일러스트 컨테이너 -->

@@ -479,7 +479,7 @@ body {
 }
 
 /* ============================================================
-   [신규 기능] 수동 공부시간 추가 영역 스타일
+   수동 공부시간 추가 영역 스타일
    ============================================================ */
 .manual-record-wrap {
     background: #F3F6F3;
@@ -558,6 +558,35 @@ body {
 .growth-card {
     display: flex;
     flex-direction: column;
+}
+
+.growth-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* [신규 기능] 성장 스토리 초기화 버튼 스타일 */
+.btn-reset-growth {
+    background: #F4F7F4;
+    border: 1px solid #D1DDD2;
+    color: #4A6E53;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-reset-growth:hover {
+    background: #E4ECE5;
+    color: #2D4C35;
+    border-color: #B4C6B6;
+    transform: translateY(-1px);
 }
 
 .growth-visual-wrap {

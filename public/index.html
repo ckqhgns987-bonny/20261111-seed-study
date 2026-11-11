@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스터디 블룸 (Study Bloom) - 뽀모도로 & 식물 성장 공부 기록</title>
+    <!-- 구글 웹 폰트 (감성적인 세리프 폰트 Cormorant Garamond & 가독성 높은 Noto Sans KR) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- 1. 상단 네비게이션 헤더 (클로재의원 레퍼런스 스타일) -->
+    <!-- ============================================================ -->
+    <header class="navbar">
+        <div class="nav-container">
+            <!-- 좌측 사각형 엠블럼 로고 -->
+            <a href="#" class="logo-box">
+                <span class="logo-icon">🌿</span>
+                <span class="logo-text">STUDY BLOOM</span>
+            </a>
+
+            <!-- 중앙 투명 메뉴 -->
+            <nav class="nav-menu">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#timer-section" class="nav-link active">Timer</a>
+                <a href="#growth-section" class="nav-link">Growth</a>
+                <a href="#feedback-section" class="nav-link">Feedback</a>
+            </nav>
+
+            <!-- 우측 언어 및 상태 안내 -->
+            <div class="nav-status">
+                <span class="lang-selector">KR / <span class="lang-dim">EN</span></span>
+                <span class="live-dot" title="실시간 연동 중"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- 2. 감성 자연 히어로 배너 (Hero Section) -->
+    <!-- ============================================================ -->
+    <section class="hero-section" id="about">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="hero-sub">Mindful Focus & Gentle Growth</p>
+            <h1 class="hero-title">Close Now, Focus for Bloom</h1>
+            <p class="hero-desc">
+                잠시 세상을 닫고 나만의 시간에 온전히 머무릅니다.<br>
+                당신의 소중한 하루가 씨앗에서 새싹으로, 그리고 찬란한 꽃으로 피어납니다.
+            </p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-label">오늘의 목표</span>
+                    <strong id="hero-goal-display">4시간 00분</strong>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">오늘 누적 공부</span>
+                    <strong id="hero-today-display">0시간 00분</strong>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">현재 성장 단계</span>
+                    <strong id="hero-stage-display">1단계 (씨앗 🌱)</strong>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 3. 메인 인터랙티브 영역 (타이머 & 3단계 식물 성장) -->
+    <!-- ============================================================ -->
+    <main class="main-container" id="timer-section">
+        
+        <div class="grid-layout">
+            
+            <!-- 좌측: 뽀모도로 타이머 컨트롤 카드 -->
+            <div class="card timer-card">
+                <div class="card-header">
+                    <span class="card-tag">POMODORO TIMER</span>
+                    <h2 class="card-title">집중의 시간</h2>
+                </div>
+
+                <!-- 타이머 모드 탭 (공부시간 / 쉬는시간) -->
+                <div class="mode-tabs">
+                    <button type="button" class="tab-btn active" id="btn-mode-study">공부 시간</button>
+                    <button type="button" class="tab-btn" id="btn-mode-break">휴식 시간</button>
+                </div>
+
+                <!-- 대형 디지털 타이머 디스플레이 -->
+                <div class="timer-display-wrap">
+                    <div class="timer-digits" id="timer-display">25:00</div>
+                    <div class="timer-status-text" id="timer-status">준비 완료 • 씨앗이 기다리고 있어요</div>
+                </div>
+
+                <!-- 타이머 제어 버튼 그룹 -->
+                <div class="timer-controls">
+                    <button type="button" class="btn btn-primary" id="btn-start">시작</button>
+                    <button type="button" class="btn btn-secondary" id="btn-pause" disabled>일시정지</button>
+                    <button type="button" class="btn btn-ghost" id="btn-reset">초기화</button>
+                </div>
+
+                <!-- 시간 설정 입력창 (분 단위 커스텀) -->
+                <div class="timer-settings">
+                    <div class="input-group">
+                        <label for="input-study-min">공부 시간 (분)</label>
+                        <input type="number" id="input-study-min" min="1" max="180" value="25">
+                    </div>
+                    <div class="input-group">
+                        <label for="input-break-min">쉬는 시간 (분)</label>
+                        <input type="number" id="input-break-min" min="1" max="60" value="5">
+                    </div>
+                </div>
+
+                <!-- 일일 목표 공부시간 설정 -->
+                <div class="goal-setting-wrap">
+                    <label for="input-goal-hours">일일 목표 공부시간 (시간)</label>
+                    <div class="goal-input-row">
+                        <input type="number" id="input-goal-hours" min="0.5" max="24" step="0.5" value="4">
+                        <button type="button" class="btn-subtle" id="btn-save-goal">목표 설정</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측: 3단계 식물 성장 시각화 카드 (씨앗 -> 새싹 -> 꽃) -->
+            <div class="card growth-card" id="growth-section">
+                <div class="card-header">
+                    <span class="card-tag">PLANT GROWTH</span>
+                    <h2 class="card-title">성장 스토리</h2>
+                </div>
+
+                <!-- 성장 그래픽 일러스트 컨테이너 -->
+                <div class="growth-visual-wrap">
+                    <div class="stage-badge" id="growth-stage-badge">1단계: 씨앗 (Seed)</div>
+                    
+                    <div class="stage-illustration-box">
+                        <!-- 1단계: 씨앗 (0 ~ 33%) -->
+                        <div class="illustration-stage active" id="stage-seed">
+                            <div class="art-circle seed-theme">
+                                <span class="plant-emoji">🌱</span>
+                            </div>
+                            <p class="stage-description">땅속 깊이 잠든 작은 씨앗.<br>당신의 집중 한 방울이 싹을 틔웁니다.</p>
+                        </div>
+
+                        <!-- 2단계: 새싹 (34 ~ 66%) -->
+                        <div class="illustration-stage" id="stage-sprout">
+                            <div class="art-circle sprout-theme">
+                                <span class="plant-emoji">🌿</span>
+                            </div>
+                            <p class="stage-description">햇살을 향해 뻗어 나온 여린 새싹.<br>꾸준한 노력이 푸른 잎으로 번져갑니다.</p>
+                        </div>
+
+                        <!-- 3단계: 꽃피우기 (67 ~ 100% 이상) -->
+                        <div class="illustration-stage" id="stage-bloom">
+                            <div class="art-circle bloom-theme">
+                                <span class="plant-emoji bloom-glow">🌸</span>
+                            </div>
+                            <p class="stage-description">축하합니다! 아름다운 꽃이 만개했습니다.<br>당신의 오늘 하루가 마침내 피어났습니다.</p>
+                        </div>
+                    </div>
+
+                    <!-- 달성률 프로그레스 바 -->
+                    <div class="progress-container">
+                        <div class="progress-labels">
+                            <span class="progress-title">목표 달성률</span>
+                            <span class="progress-percentage" id="growth-percent-text">0%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" id="growth-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="progress-milestones">
+                            <span>0% 씨앗</span>
+                            <span>34% 새싹</span>
+                            <span>67% 꽃피움</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+
+                    <!-- 요약 인포 -->
+                    <div class="growth-summary-box">
+                        <div class="summary-line">
+                            <span>오늘 누적 집중 시간</span>
+                            <strong id="summary-accumulated">0분 (0.0시간)</strong>
+                        </div>
+                        <div class="summary-line">
+                            <span>목표까지 남은 시간</span>
+                            <strong id="summary-remaining">240분</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 4. 피드백 작성 및 최신순 목록 카드 (Supabase + OpenAI) -->
+        <!-- ============================================================ -->
+        <section class="feedback-section" id="feedback-section">
+            <div class="card feedback-card">
+                <div class="card-header">
+                    <span class="card-tag">COMMUNITY & CHEER</span>
+                    <h2 class="card-title">오늘의 한 줄 & 응원 나누기</h2>
+                    <p class="card-subtitle">로그인 없이 자유롭게 오늘의 공부 소감이나 피드백을 남겨보세요. 따뜻한 AI 응원이 함께합니다.</p>
+                </div>
+
+                <!-- 피드백 입력 폼 -->
+                <form class="feedback-form" id="feedback-form">
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label for="input-nickname">닉네임 (선택)</label>
+                            <input type="text" id="input-nickname" placeholder="익명" maxlength="20">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-content">오늘의 공부 소감 또는 피드백 (필수)</label>
+                        <textarea id="input-content" rows="3" placeholder="오늘 25분 집중 성공했어요! 모두 파이팅입니다 :)" required></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="btn-submit-feedback">
+                            <span>피드백 전송 및 AI 응원받기</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- 최신 피드백 목록 영역 -->
+                <div class="feedback-list-wrap">
+                    <div class="list-header">
+                        <h3>최근 응원 및 피드백 <span class="badge" id="feedback-count">0</span></h3>
+                        <button type="button" class="btn-refresh" id="btn-refresh-feedback" title="새로고침">🔄 새로고침</button>
+                    </div>
+
+                    <div class="feedback-list" id="feedback-list">
+                        <!-- 자바스크립트로 최신순 피드백 카드 동적 렌더링 -->
+                        <div class="empty-state">피드백을 불러오는 중이거나 아직 등록된 글이 없습니다.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 토스트 알림창 컨테이너 -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <p>© 2026 Study Bloom (PomoBloom). Crafted with Mindful Serenity.</p>
+    </footer>
+
+    <!-- 자바스크립트 로직 로드 -->
+    <script src="app.js"></script>
+</body>
+</html>
+

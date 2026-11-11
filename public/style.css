@@ -1,0 +1,851 @@
+/* ==============================================================================
+   [public/style.css - 스터디 블룸 디자인 시스템]
+   자연 친화적 감성 레퍼런스 스타일 (세이지 그린, 소프트 아이보리, 로즈 핑크 포인트)
+   ============================================================================== */
+
+:root {
+    --bg-primary: #F7F8F6;
+    --bg-card: #FFFFFF;
+    --text-dark: #2C3531;
+    --text-muted: #6B7770;
+    --primary-green: #4A7C59;
+    --primary-green-hover: #3D6649;
+    --accent-pink: #E8A5A5;
+    --accent-gold: #D4A373;
+    --border-subtle: #E2E6E1;
+    --border-hover: #CBD4CA;
+    --shadow-soft: 0 10px 30px rgba(44, 53, 49, 0.05);
+    --shadow-hover: 0 16px 40px rgba(44, 53, 49, 0.08);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 24px;
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* 기본 리셋 및 폰트 설정 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-dark);
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+/* ============================================================
+   1. 상단 네비게이션 헤더 (클로재의원 레퍼런스 스타일)
+   ============================================================ */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(247, 248, 246, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 14px 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 좌측 사각 엠블럼 로고 */
+.logo-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #1E2522;
+    color: #FFFFFF;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    font-size: 0.85rem;
+    transition: var(--transition);
+}
+
+.logo-box:hover {
+    background: var(--primary-green);
+    transform: translateY(-1px);
+}
+
+.logo-icon {
+    font-size: 1.1rem;
+}
+
+/* 중앙 네비게이션 메뉴 */
+.nav-menu {
+    display: flex;
+    gap: 32px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    transition: var(--transition);
+    position: relative;
+    padding: 4px 0;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--primary-green);
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-green);
+    border-radius: 2px;
+}
+
+/* 우측 언어 / 상태 표시 */
+.nav-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.lang-dim {
+    color: #A0ABA4;
+    font-weight: 400;
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary-green);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.2);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 124, 89, 0.5); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(74, 124, 89, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 124, 89, 0); }
+}
+
+/* ============================================================
+   2. 자연 감성 히어로 배너 (Hero Section)
+   ============================================================ */
+.hero-section {
+    position: relative;
+    background: linear-gradient(135deg, #2D4030 0%, #3D5A43 45%, #233527 100%);
+    color: #FFFFFF;
+    padding: 90px 24px 80px;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* 자연 감성 부드러운 오버레이 패턴 */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.08) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #CFE0D3;
+    margin-bottom: 12px;
+}
+
+.hero-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 3.4rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.hero-desc {
+    font-size: 1.05rem;
+    color: #E2ECE5;
+    font-weight: 300;
+    line-height: 1.7;
+    margin-bottom: 40px;
+}
+
+.hero-stats {
+    display: inline-flex;
+    align-items: center;
+    gap: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 40px;
+    padding: 14px 36px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #B4CBB9;
+    letter-spacing: 0.05em;
+}
+
+.stat-item strong {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================================
+   3. 메인 인터랙티브 레이아웃 & 카드 시스템
+   ============================================================ */
+.main-container {
+    max-width: 1200px;
+    margin: -30px auto 60px;
+    padding: 0 24px;
+    position: relative;
+    z-index: 10;
+}
+
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 36px;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-hover);
+    border-color: var(--border-hover);
+}
+
+.card-header {
+    margin-bottom: 24px;
+}
+
+.card-tag {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--primary-green);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.card-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-top: 4px;
+}
+
+.card-subtitle {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+
+/* ============================================================
+   4. 뽀모도로 타이머 컨트롤
+   ============================================================ */
+.mode-tabs {
+    display: flex;
+    background: var(--bg-primary);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 28px;
+}
+
+.tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tab-btn.active {
+    background: #FFFFFF;
+    color: var(--primary-green);
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.timer-display-wrap {
+    text-align: center;
+    padding: 24px 0 16px;
+    background: radial-gradient(circle, rgba(74, 124, 89, 0.04) 0%, transparent 70%);
+    border-radius: var(--radius-md);
+    margin-bottom: 24px;
+}
+
+.timer-digits {
+    font-family: 'Cormorant Garamond', Georgia, monospace;
+    font-size: 5.2rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1;
+    letter-spacing: 0.05em;
+}
+
+.timer-status-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 10px;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.btn {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background: var(--primary-green);
+    color: #FFFFFF;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--primary-green-hover);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #E8ECE6;
+    color: var(--text-dark);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #DDE3DA;
+}
+
+.btn-ghost {
+    background: transparent;
+    border-color: var(--border-subtle);
+    color: var(--text-muted);
+}
+
+.btn-ghost:hover:not(:disabled) {
+    border-color: var(--text-dark);
+    color: var(--text-dark);
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.timer-settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-subtle);
+    margin-bottom: 18px;
+}
+
+.input-group label,
+.goal-setting-wrap label,
+.form-group label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.input-group input,
+.goal-input-row input,
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    font-size: 0.92rem;
+    color: var(--text-dark);
+    background: #FFFFFF;
+    outline: none;
+    transition: var(--transition);
+}
+
+.input-group input:focus,
+.goal-input-row input:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.12);
+}
+
+.goal-setting-wrap {
+    padding-top: 14px;
+    border-top: 1px dashed var(--border-subtle);
+}
+
+.goal-input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-subtle {
+    padding: 10px 18px;
+    background: #EDF1EB;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    color: var(--primary-green);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+.btn-subtle:hover {
+    background: var(--primary-green);
+    color: #FFFFFF;
+}
+
+/* ============================================================
+   5. 3단계 식물 성장 시각화 (씨앗 -> 새싹 -> 꽃)
+   ============================================================ */
+.growth-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.growth-visual-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+}
+
+.stage-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: #EAF1EB;
+    color: var(--primary-green);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+.stage-illustration-box {
+    position: relative;
+    width: 100%;
+    min-height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.illustration-stage {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.illustration-stage.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.art-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    transition: var(--transition);
+}
+
+.seed-theme {
+    background: linear-gradient(135deg, #F3ECE6 0%, #E6D7CB 100%);
+    border: 3px solid #D9C3B0;
+}
+
+.sprout-theme {
+    background: linear-gradient(135deg, #E6F3E8 0%, #CDE8D2 100%);
+    border: 3px solid #A8D5B0;
+}
+
+.bloom-theme {
+    background: linear-gradient(135deg, #FCE8E8 0%, #F8D0D0 100%);
+    border: 3px solid var(--accent-pink);
+}
+
+.plant-emoji {
+    font-size: 4.5rem;
+    line-height: 1;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+.bloom-glow {
+    animation: bloomPulse 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes bloomPulse {
+    0% { transform: scale(1); filter: drop-shadow(0 4px 10px rgba(232, 165, 165, 0.4)); }
+    100% { transform: scale(1.08); filter: drop-shadow(0 8px 20px rgba(232, 165, 165, 0.8)); }
+}
+
+.stage-description {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* 프로그레스 바 */
+.progress-container {
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+}
+
+.progress-title {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.progress-percentage {
+    font-weight: 700;
+    color: var(--primary-green);
+}
+
+.progress-track {
+    width: 100%;
+    height: 12px;
+    background: var(--bg-primary);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border-subtle);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-green) 0%, var(--accent-pink) 100%);
+    border-radius: 6px;
+    transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.progress-milestones {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 0.72rem;
+    color: #92A097;
+}
+
+.growth-summary-box {
+    width: 100%;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+.summary-line strong {
+    color: var(--text-dark);
+}
+
+/* ============================================================
+   6. 피드백 섹션 및 목록
+   ============================================================ */
+.feedback-card {
+    padding: 40px;
+}
+
+.feedback-form {
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    margin-bottom: 36px;
+    border: 1px solid var(--border-subtle);
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.list-header h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.badge {
+    display: inline-block;
+    background: #E8ECE6;
+    color: var(--primary-green);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-left: 6px;
+}
+
+.btn-refresh {
+    background: none;
+    border: 1px solid var(--border-subtle);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.btn-refresh:hover {
+    border-color: var(--primary-green);
+    color: var(--primary-green);
+}
+
+.feedback-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.feedback-item {
+    background: #FFFFFF;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    transition: var(--transition);
+}
+
+.feedback-item:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.feedback-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.feedback-author {
+    font-weight: 600;
+    color: var(--primary-green);
+}
+
+.feedback-content {
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+}
+
+.feedback-ai-box {
+    background: #F4F8F5;
+    border-left: 3px solid var(--primary-green);
+    padding: 10px 14px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 0.88rem;
+    color: #365341;
+}
+
+.ai-tag {
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: var(--primary-green);
+    margin-right: 6px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* ============================================================
+   7. 토스트 알림창
+   ============================================================ */
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    min-width: 280px;
+    padding: 14px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #FFFFFF;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    animation: toastSlideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.toast-success { background: var(--primary-green); }
+.toast-error { background: #D9534F; }
+.toast-info { background: #337AB7; }
+
+@keyframes toastSlideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   8. 푸터 & 반응형 미디어 쿼리
+   ============================================================ */
+.footer {
+    text-align: center;
+    padding: 40px 24px;
+    font-size: 0.82rem;
+    color: #92A097;
+    border-top: 1px solid var(--border-subtle);
+}
+
+@media (max-width: 900px) {
+    .grid-layout {
+        grid-template-columns: 1fr;
+    }
+    .hero-title {
+        font-size: 2.6rem;
+    }
+    .hero-stats {
+        flex-direction: column;
+        gap: 14px;
+        border-radius: var(--radius-md);
+        padding: 20px;
+    }
+    .stat-divider {
+        display: none;
+    }
+    .nav-menu {
+        display: none;
+    }
+}
+

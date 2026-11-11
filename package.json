@@ -1,0 +1,27 @@
+{
+  "name": "pomobloom-service",
+  "version": "1.0.0",
+  "description": "스터디 블룸 (Study Bloom / PomoBloom) - 뽀모도로 타이머 & 3단계 성장형 공부 인증 웹앱",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "pomodoro",
+    "study-bloom",
+    "vanilla-js",
+    "supabase",
+    "openai"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "openai": "^4.85.4"
+  }
+}
+

@@ -77,7 +77,7 @@
         
         <div class="grid-layout">
             
-            <!-- 좌측: 뽀모도로 타이머 컨트롤 카드 -->
+            <!-- 좌측: 뽀모도로 타이머 & 직접 공부시간 기록 카드 -->
             <div class="card timer-card">
                 <div class="card-header">
                     <span class="card-tag">POMODORO TIMER</span>
@@ -123,6 +123,33 @@
                         <button type="button" class="btn-subtle" id="btn-save-goal">목표 설정</button>
                     </div>
                 </div>
+
+                <!-- ============================================================ -->
+                <!-- [신규 기능] 사용자가 직접 공부시간을 추가하는 영역 -->
+                <!-- ============================================================ -->
+                <div class="manual-record-wrap">
+                    <div class="manual-record-header">
+                        <label for="input-manual-minutes">직접 공부시간 추가하기 (분)</label>
+                        <span class="manual-record-guide">원하는 만큼 직접 추가하여 식물을 키워보세요 🌱</span>
+                    </div>
+
+                    <!-- 간편 퀵 추가 버튼들 -->
+                    <div class="quick-chips">
+                        <button type="button" class="chip-btn" data-min="10">+10분</button>
+                        <button type="button" class="chip-btn" data-min="25">+25분</button>
+                        <button type="button" class="chip-btn" data-min="50">+50분</button>
+                        <button type="button" class="chip-btn" data-min="60">+1시간</button>
+                    </div>
+
+                    <!-- 수동 시간 입력 및 추가 버튼 -->
+                    <div class="manual-input-row">
+                        <input type="number" id="input-manual-minutes" min="1" max="720" value="25" placeholder="분 단위 입력">
+                        <button type="button" class="btn btn-add-time" id="btn-add-manual-time">
+                            <span>+ 공부시간 기록하기</span>
+                        </button>
+                    </div>
+                </div>
+
             </div>
 
             <!-- 우측: 3단계 식물 성장 시각화 카드 (씨앗 -> 새싹 -> 꽃) -->
@@ -255,4 +282,3 @@
     <script src="app.js"></script>
 </body>
 </html>
-

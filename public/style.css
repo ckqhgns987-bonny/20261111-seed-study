@@ -415,7 +415,8 @@ body {
 
 .input-group label,
 .goal-setting-wrap label,
-.form-group label {
+.form-group label,
+.manual-record-header label {
     display: block;
     font-size: 0.82rem;
     font-weight: 600;
@@ -425,6 +426,7 @@ body {
 
 .input-group input,
 .goal-input-row input,
+.manual-input-row input,
 .form-group input,
 .form-group textarea {
     width: 100%;
@@ -440,6 +442,7 @@ body {
 
 .input-group input:focus,
 .goal-input-row input:focus,
+.manual-input-row input:focus,
 .form-group input:focus,
 .form-group textarea:focus {
     border-color: var(--primary-green);
@@ -449,6 +452,7 @@ body {
 .goal-setting-wrap {
     padding-top: 14px;
     border-top: 1px dashed var(--border-subtle);
+    margin-bottom: 20px;
 }
 
 .goal-input-row {
@@ -472,6 +476,80 @@ body {
 .btn-subtle:hover {
     background: var(--primary-green);
     color: #FFFFFF;
+}
+
+/* ============================================================
+   [신규 기능] 수동 공부시간 추가 영역 스타일
+   ============================================================ */
+.manual-record-wrap {
+    background: #F3F6F3;
+    border: 1px solid #DCE4DB;
+    border-radius: var(--radius-md);
+    padding: 18px;
+    margin-top: 16px;
+}
+
+.manual-record-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+}
+
+.manual-record-guide {
+    font-size: 0.75rem;
+    color: var(--primary-green);
+    font-weight: 500;
+}
+
+.quick-chips {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.chip-btn {
+    background: #FFFFFF;
+    border: 1px solid #CFDACD;
+    color: #35533F;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.chip-btn:hover {
+    background: var(--primary-green);
+    color: #FFFFFF;
+    border-color: var(--primary-green);
+    transform: translateY(-1px);
+}
+
+.manual-input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-add-time {
+    background: var(--primary-green);
+    color: #FFFFFF;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition);
+}
+
+.btn-add-time:hover {
+    background: var(--primary-green-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.25);
 }
 
 /* ============================================================
@@ -848,4 +926,3 @@ body {
         display: none;
     }
 }
-

@@ -4,10 +4,11 @@
 // 본 파일은 프레임워크 없는 순수 Vanilla JavaScript (ES6+)로 작성되었으며,
 // 다음 핵심 기능들을 담당합니다:
 // 1. 뽀모도로 타이머 (공부/쉬는시간 카운트다운, 시작/일시정지/초기화)
-// 2. 일일 목표 공부시간 설정 및 누적 시간 합산
-// 3. 3단계 식물 성장 시각화 (0~33% 씨앗, 34~66% 새싹, 67%~ 꽃피우기)
-// 4. 비로그인 피드백 작성/조회 및 OpenAI 감성 응원 한마디 연동
-// 5. 사용자 오류 토스트 안내창 표시
+// 2. 사용자가 직접 입력하는 공부시간 수동 누적 기능 (타이머 자동 합산 제거)
+// 3. 일일 목표 공부시간 설정 및 누적 시간 합산
+// 4. 3단계 식물 성장 시각화 (0~33% 씨앗, 34~66% 새싹, 67%~ 꽃피우기)
+// 5. 비로그인 피드백 작성/조회 및 OpenAI 감성 응원 한마디 연동
+// 6. 사용자 오류 토스트 안내창 표시
 // ==============================================================================
 
 // ==============================================================================
@@ -42,6 +43,11 @@ const DOM = {
     btnModeBreak: document.getElementById('btn-mode-break'),
     inputStudyMin: document.getElementById('input-study-min'),
     inputBreakMin: document.getElementById('input-break-min'),
+
+    // [신규] 수동 공부시간 추가 요소
+    inputManualMinutes: document.getElementById('input-manual-minutes'),
+    btnAddManualTime: document.getElementById('btn-add-manual-time'),
+    quickChips: document.querySelectorAll('.chip-btn'),
 
     // 목표 및 히어로 표시 요소
     inputGoalHours: document.getElementById('input-goal-hours'),
@@ -188,7 +194,44 @@ function updateGrowthDisplay() {
 }
 
 // ==============================================================================
-// 6. 뽀모도로 타이머 제어 함수들
+// 6. [신규 기능] 사용자가 직접 공부시간을 기록하는 로직 (수동 추가)
+// ==============================================================================
+/**
+ * 사용자가 입력한 분 단위 공부시간을 누적 시간에 수동으로 추가합니다.
+ * @param {number} minutesToAdd - 추가할 공부 시간(분)
+ */
+async function addManualStudyTime(minutesToAdd) {
+    const minutes = parseInt(minutesToAdd, 10);
+
+    // 유효성 검사 (음수 또는 0 이하 입력 방지)
+    if (isNaN(minutes) || minutes <= 0) {
+        showToast('올바른 공부시간(1분 이상)을 입력해 주세요.', 'error');
+        return;
+    }
+
+    // 1. 로컬 상태에 누적 시간 합산
+    STATE.accumulatedMinutes += minutes;
+
+    // 2. 화면의 성장률 및 씨앗/새싹/꽃 그래픽 즉시 업데이트
+    updateGrowthDisplay();
+
+    // 3. 사용자 안내 토스트 메시지 표출
+    showToast(`🌱 ${minutes}분이 내 공부시간에 추가되었습니다! 식물이 무럭무럭 자라납니다.`, 'success');
+
+    // 4. 백엔드 API를 통해 Supabase study_logs 테이블에 안전하게 기록
+    try {
+        await fetch('/api/timer-log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ study_minutes: minutes })
+        });
+    } catch (err) {
+        console.warn('[공부 기록 저장 알림]:', err.message);
+    }
+}
+
+// ==============================================================================
+// 7. 뽀모도로 타이머 제어 함수들 (자동 합산 제거됨)
 // ==============================================================================
 /**
  * 타이머 카운트다운 시작
@@ -237,7 +280,9 @@ function resetTimer() {
 }
 
 /**
- * 타이머 완료 처리 (공부시간 합산 및 서버 기록)
+ * 타이머 완료 처리:
+ * [중요 변경사항]: 자동으로 공부시간을 합산하지 않고,
+ * 사용자가 직접 [공부시간 기록하기]를 누르도록 친절하게 안내합니다.
  */
 function completeTimer() {
     clearInterval(STATE.timerInterval);
@@ -246,20 +291,16 @@ function completeTimer() {
     DOM.btnPause.disabled = true;
 
     if (STATE.timerMode === 'study') {
-        const addedMinutes = STATE.currentSetStudyMin;
-        STATE.accumulatedMinutes += addedMinutes;
-        updateGrowthDisplay();
+        const completedMin = STATE.currentSetStudyMin;
+        
+        // 자동 추가하지 않고, 사용자가 직접 추가할 수 있도록 입력창 기본값에 방금 마친 시간을 세팅해 줍니다.
+        if (DOM.inputManualMinutes) {
+            DOM.inputManualMinutes.value = completedMin;
+        }
 
-        showToast(`🎉 ${addedMinutes}분 집중 완료! 식물에 소중한 햇살이 더해졌습니다.`, 'success');
+        showToast(`🎉 ${completedMin}분 집중 타이머가 끝났습니다! 아래 [공부시간 기록하기]를 눌러 소중한 공부시간을 직접 적립해 보세요 🌿`, 'info');
 
-        // 백엔드 API에 공부 기록 비동기 저장 (/api/timer-log)
-        fetch('/api/timer-log', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ study_minutes: addedMinutes })
-        }).catch(err => console.warn('[공부 기록 저장 알림]:', err.message));
-
-        // 쉬는시간 모드로 자동 전환 제안
+        // 쉬는시간 모드로 전환 제안
         switchTimerMode('break');
     } else {
         showToast('☕ 휴식 시간이 끝났습니다. 다시 집중을 시작해볼까요?', 'info');
@@ -291,7 +332,7 @@ function switchTimerMode(newMode) {
 }
 
 // ==============================================================================
-// 7. 피드백 CRUD 및 OpenAI 응원 연동 로직
+// 8. 피드백 CRUD 및 OpenAI 응원 연동 로직
 // ==============================================================================
 /**
  * 최신순 피드백 목록을 서버에서 불러와 화면에 렌더링합니다.
@@ -431,7 +472,7 @@ function escapeHtml(str) {
 }
 
 // ==============================================================================
-// 8. 이벤트 리스너 등록 & 초기화 실행
+// 9. 이벤트 리스너 등록 & 초기화 실행
 // ==============================================================================
 function initEventListeners() {
     // 타이머 제어 버튼들
@@ -484,6 +525,21 @@ function initEventListeners() {
         showToast(`일일 목표가 ${val}시간으로 설정되었습니다.`, 'success');
     });
 
+    // [신규] 수동 공부시간 추가 버튼 이벤트
+    DOM.btnAddManualTime.addEventListener('click', () => {
+        const val = parseInt(DOM.inputManualMinutes.value, 10);
+        addManualStudyTime(val);
+    });
+
+    // [신규] 퀵 추가 칩 버튼 (+10분, +25분, +50분, +1시간) 이벤트
+    DOM.quickChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const min = parseInt(chip.dataset.min, 10);
+            DOM.inputManualMinutes.value = min;
+            addManualStudyTime(min);
+        });
+    });
+
     // 피드백 관련
     DOM.feedbackForm.addEventListener('submit', handleFeedbackSubmit);
     DOM.btnRefreshFeedback.addEventListener('click', () => {
@@ -519,4 +575,3 @@ function initApp() {
 
 // DOM 콘텐츠가 준비되면 앱 실행
 document.addEventListener('DOMContentLoaded', initApp);
-

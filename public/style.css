@@ -298,14 +298,14 @@ body {
 }
 
 /* ============================================================
-   4. 뽀모도로 타이머 컨트롤
+   4. 뽀모도로 타이머 컨트롤 & 물뿌리개 감성 인터랙션
    ============================================================ */
 .mode-tabs {
     display: flex;
     background: var(--bg-primary);
     padding: 4px;
     border-radius: var(--radius-sm);
-    margin-bottom: 28px;
+    margin-bottom: 24px;
 }
 
 .tab-btn {
@@ -329,11 +329,109 @@ body {
 }
 
 .timer-display-wrap {
+    position: relative;
     text-align: center;
-    padding: 24px 0 16px;
-    background: radial-gradient(circle, rgba(74, 124, 89, 0.04) 0%, transparent 70%);
+    padding: 16px 0 20px;
+    background: radial-gradient(circle, rgba(74, 124, 89, 0.05) 0%, transparent 70%);
     border-radius: var(--radius-md);
     margin-bottom: 24px;
+    overflow: hidden;
+}
+
+/* [물뿌리개 감성 인터랙션 컨테이너] */
+.watering-interaction-box {
+    position: relative;
+    width: 140px;
+    height: 80px;
+    margin: 0 auto 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.watering-can-wrapper {
+    width: 88px;
+    height: 66px;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: 75% 70%; /* 손잡이 아래를 축으로 회전 */
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
+}
+
+.watering-can-svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* 타이머 동작 시: 물뿌리개가 부드럽게 18도 기울어짐 */
+.watering-active .watering-can-wrapper {
+    transform: rotate(-20deg) translateY(-2px);
+    animation: gentleWaterShake 2s infinite alternate ease-in-out;
+}
+
+@keyframes gentleWaterShake {
+    0% { transform: rotate(-20deg) translateY(-2px); }
+    100% { transform: rotate(-23deg) translateY(-4px); }
+}
+
+/* 떨어지는 물방울 스트림 */
+.water-drops-stream {
+    position: absolute;
+    top: 36px;
+    left: 20px;
+    width: 30px;
+    height: 50px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.watering-active .water-drops-stream {
+    opacity: 1;
+}
+
+.water-drop {
+    position: absolute;
+    font-size: 0.95rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(74, 124, 89, 0.4));
+    opacity: 0;
+}
+
+.drop-1 {
+    left: 4px;
+    top: 0;
+    animation: dropFall 1.2s infinite cubic-bezier(0.55, 0.085, 0.68, 0.53);
+}
+
+.drop-2 {
+    left: 12px;
+    top: 0;
+    animation: dropFall 1.4s infinite 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+}
+
+.drop-3 {
+    left: 8px;
+    top: 0;
+    animation: dropFall 1.1s infinite 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+}
+
+@keyframes dropFall {
+    0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.6);
+    }
+    30% {
+        opacity: 1;
+        transform: translateY(12px) scale(1);
+    }
+    80% {
+        opacity: 0.9;
+        transform: translateY(32px) scale(0.9);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(44px) scale(0.4);
+    }
 }
 
 .timer-digits {
@@ -343,12 +441,20 @@ body {
     color: var(--text-dark);
     line-height: 1;
     letter-spacing: 0.05em;
+    position: relative;
+    z-index: 2;
 }
 
 .timer-status-text {
     font-size: 0.9rem;
     color: var(--text-muted);
     margin-top: 10px;
+    transition: color 0.3s ease;
+}
+
+.watering-active .timer-status-text {
+    color: var(--primary-green);
+    font-weight: 500;
 }
 
 .timer-controls {
@@ -566,7 +672,6 @@ body {
     align-items: flex-start;
 }
 
-/* [신규 기능] 성장 스토리 초기화 버튼 스타일 */
 .btn-reset-growth {
     background: #F4F7F4;
     border: 1px solid #D1DDD2;

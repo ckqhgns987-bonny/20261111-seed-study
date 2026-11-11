@@ -4,12 +4,13 @@
 // 본 파일은 프레임워크 없는 순수 Vanilla JavaScript (ES6+)로 작성되었으며,
 // 다음 핵심 기능들을 담당합니다:
 // 1. 뽀모도로 타이머 (공부/쉬는시간 카운트다운, 시작/일시정지/초기화)
-// 2. 사용자가 직접 입력하는 공부시간 수동 누적 기능 (타이머 자동 합산 제거)
-// 3. 일일 목표 공부시간 설정 및 누적 시간 합산
-// 4. 3단계 식물 성장 시각화 (0~33% 씨앗, 34~66% 새싹, 67%~ 꽃피우기)
-// 5. 성장 스토리 초기화 (새 씨앗으로 리셋하여 다음 공부에도 적용 가능)
-// 6. 비로그인 피드백 작성/조회 및 OpenAI 감성 응원 한마디 연동
-// 7. 사용자 오류 토스트 안내창 표시 및 API 방어 로직
+// 2. [물뿌리개 감성 인터랙션] 타이머 실행 시 물뿌리개가 기울어지며 물방울(단비)을 주는 애니메이션
+// 3. 사용자가 직접 입력하는 공부시간 수동 누적 기능 (타이머 자동 합산 제거)
+// 4. 일일 목표 공부시간 설정 및 누적 시간 합산
+// 5. 3단계 식물 성장 시각화 (0~33% 씨앗, 34~66% 새싹, 67%~ 꽃피우기)
+// 6. 성장 스토리 초기화 (새 씨앗으로 리셋하여 다음 공부에도 적용 가능)
+// 7. 비로그인 피드백 작성/조회 및 OpenAI 감성 응원 한마디 연동
+// 8. 사용자 오류 토스트 안내창 표시 및 API 방어 로직
 // ==============================================================================
 
 // ==============================================================================
@@ -34,7 +35,9 @@ const STATE = {
 // 2. DOM 요소 참조 캐싱
 // ==============================================================================
 const DOM = {
-    // 타이머 요소
+    // 타이머 및 물뿌리개 요소
+    timerDisplayWrap: document.getElementById('timer-display-wrap'),
+    wateringBox: document.getElementById('watering-box'),
     timerDisplay: document.getElementById('timer-display'),
     timerStatus: document.getElementById('timer-status'),
     btnStart: document.getElementById('btn-start'),
@@ -253,10 +256,10 @@ function resetGrowthStory() {
 }
 
 // ==============================================================================
-// 8. 뽀모도로 타이머 제어 함수들 (자동 합산 제거됨)
+// 8. 뽀모도로 타이머 제어 함수들 (물뿌리개 감성 인터랙션 연동)
 // ==============================================================================
 /**
- * 타이머 카운트다운 시작
+ * 타이머 카운트다운 시작 (물뿌리개 기울어짐 및 물방울 애니메이션 시작)
  */
 function startTimer() {
     if (STATE.isRunning) return;
@@ -264,7 +267,17 @@ function startTimer() {
     STATE.isRunning = true;
     DOM.btnStart.disabled = true;
     DOM.btnPause.disabled = false;
-    DOM.timerStatus.textContent = STATE.timerMode === 'study' ? '집중하는 중입니다... 차분히 몰입하세요 🌱' : '편안히 쉬어가는 중입니다 ☕';
+
+    // [신규] 물뿌리개 애니메이션 활성화 클래스 부여
+    if (DOM.timerDisplayWrap) {
+        DOM.timerDisplayWrap.classList.add('watering-active');
+    }
+
+    if (STATE.timerMode === 'study') {
+        DOM.timerStatus.textContent = '소중한 집중의 단비를 씨앗에 주는 중... 💧🌱';
+    } else {
+        DOM.timerStatus.textContent = '편안히 쉬어가는 중입니다... 따뜻한 차 한 잔 ☕';
+    }
 
     STATE.timerInterval = setInterval(() => {
         if (STATE.remainingSeconds > 0) {
@@ -278,7 +291,7 @@ function startTimer() {
 }
 
 /**
- * 타이머 일시정지
+ * 타이머 일시정지 (물뿌리개 원래 각도로 복귀 & 물방울 멈춤)
  */
 function pauseTimer() {
     if (!STATE.isRunning) return;
@@ -287,23 +300,35 @@ function pauseTimer() {
     STATE.isRunning = false;
     DOM.btnStart.disabled = false;
     DOM.btnPause.disabled = true;
-    DOM.timerStatus.textContent = '타이머가 일시정지되었습니다.';
+
+    // [신규] 물뿌리개 애니메이션 비활성화
+    if (DOM.timerDisplayWrap) {
+        DOM.timerDisplayWrap.classList.remove('watering-active');
+    }
+
+    DOM.timerStatus.textContent = '타이머가 일시정지되었습니다. 잠시 숨을 고르세요 ☕';
 }
 
 /**
- * 타이머 초기화 (현재 모드의 초기 시간으로 리셋)
+ * 타이머 초기화 (현재 모드의 초기 시간으로 리셋 & 물뿌리개 복귀)
  */
 function resetTimer() {
     pauseTimer();
     const targetMin = STATE.timerMode === 'study' ? STATE.currentSetStudyMin : STATE.currentSetBreakMin;
     STATE.remainingSeconds = targetMin * 60;
     renderTimer();
-    DOM.timerStatus.textContent = '준비 완료 • 새로운 집중을 시작해보세요';
+
+    // 물뿌리개 비활성화 유지
+    if (DOM.timerDisplayWrap) {
+        DOM.timerDisplayWrap.classList.remove('watering-active');
+    }
+
+    DOM.timerStatus.textContent = '준비 완료 • 씨앗이 단비를 기다리고 있어요 🌱';
 }
 
 /**
  * 타이머 완료 처리:
- * 자동으로 공부시간을 합산하지 않고, 사용자가 직접 수동 기록하도록 안내합니다.
+ * 물뿌리개를 멈추고, 사용자가 직접 수동 기록하도록 안내합니다.
  */
 function completeTimer() {
     clearInterval(STATE.timerInterval);
@@ -311,20 +336,25 @@ function completeTimer() {
     DOM.btnStart.disabled = false;
     DOM.btnPause.disabled = true;
 
+    // 물뿌리개 애니메이션 종료
+    if (DOM.timerDisplayWrap) {
+        DOM.timerDisplayWrap.classList.remove('watering-active');
+    }
+
     if (STATE.timerMode === 'study') {
         const completedMin = STATE.currentSetStudyMin;
         
-        // 자동 추가하지 않고, 사용자가 직접 추가할 수 있도록 입력창 기본값에 방금 마친 시간을 세팅해 줍니다.
+        // 사용자가 바로 추가할 수 있도록 입력창 기본값에 방금 마친 시간 세팅
         if (DOM.inputManualMinutes) {
             DOM.inputManualMinutes.value = completedMin;
         }
 
-        showToast(`🎉 ${completedMin}분 집중 타이머가 끝났습니다! 아래 [공부시간 기록하기]를 눌러 소중한 공부시간을 직접 적립해 보세요 🌿`, 'info');
+        showToast(`🎉 ${completedMin}분간 정성껏 단비를 주었습니다! 아래 [공부시간 기록하기]를 눌러 성장 스토리에 반영해 보세요 🌿`, 'info');
 
         // 쉬는시간 모드로 전환 제안
         switchTimerMode('break');
     } else {
-        showToast('☕ 휴식 시간이 끝났습니다. 다시 집중을 시작해볼까요?', 'info');
+        showToast('☕ 휴식 시간이 끝났습니다. 다시 집중의 단비를 주러 가볼까요?', 'info');
         switchTimerMode('study');
     }
 }
@@ -341,19 +371,19 @@ function switchTimerMode(newMode) {
         DOM.btnModeStudy.classList.add('active');
         DOM.btnModeBreak.classList.remove('active');
         STATE.remainingSeconds = STATE.currentSetStudyMin * 60;
-        DOM.timerStatus.textContent = '공부 시간 모드 • 씨앗이 기다리고 있어요';
+        DOM.timerStatus.textContent = '공부 시간 모드 • 씨앗이 단비를 기다리고 있어요 🌱';
     } else {
         DOM.btnModeStudy.classList.remove('active');
         DOM.btnModeBreak.classList.add('active');
         STATE.remainingSeconds = STATE.currentSetBreakMin * 60;
-        DOM.timerStatus.textContent = '휴식 시간 모드 • 잠시 눈을 감고 숨을 고르세요';
+        DOM.timerStatus.textContent = '휴식 시간 모드 • 잠시 눈을 감고 숨을 고르세요 ☕';
     }
 
     renderTimer();
 }
 
 // ==============================================================================
-// 9. 피드백 CRUD 및 OpenAI 응원 연동 로직 (방어 파싱 강화)
+// 9. 피드백 CRUD 및 OpenAI 응원 연동 로직
 // ==============================================================================
 /**
  * 최신순 피드백 목록을 서버에서 불러와 화면에 렌더링합니다.

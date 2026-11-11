@@ -90,10 +90,38 @@
                     <button type="button" class="tab-btn" id="btn-mode-break">휴식 시간</button>
                 </div>
 
-                <!-- 대형 디지털 타이머 디스플레이 -->
-                <div class="timer-display-wrap">
+                <!-- 대형 디지털 타이머 디스플레이 & 물뿌리개 감성 인터랙션 -->
+                <div class="timer-display-wrap" id="timer-display-wrap">
+                    
+                    <!-- [신규 기능] 감성 클래식 물뿌리개 & 물방울 애니메이션 -->
+                    <div class="watering-interaction-box" id="watering-box">
+                        <div class="watering-can-wrapper">
+                            <!-- 세이지 그린 & 골드 감성의 클래식 물뿌리개 SVG -->
+                            <svg class="watering-can-svg" viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <!-- 본체 (물통) -->
+                                <path d="M42 34C42 30 46 26 52 26H76C82 26 86 30 86 34V68C86 73 81 77 75 77H53C47 77 42 73 42 68V34Z" fill="#4A7C59" stroke="#375E43" stroke-width="2.5"/>
+                                <!-- 손잡이 (핸들) -->
+                                <path d="M86 36C98 36 106 44 106 55C106 66 98 72 86 72" stroke="#D4A373" stroke-width="3.5" stroke-linecap="round"/>
+                                <!-- 물 주구 (노즐 파이프) -->
+                                <path d="M44 60L22 40" stroke="#4A7C59" stroke-width="5" stroke-linecap="round"/>
+                                <!-- 샤워 헤드 (물뿌리개 끝부분) -->
+                                <path d="M25 36L16 45L12 40L21 31L25 36Z" fill="#D4A373" stroke="#B88A5E" stroke-width="1.5"/>
+                                <!-- 노즐 분사구 홀 포인트 -->
+                                <circle cx="16" cy="41" r="1.5" fill="#FFFFFF"/>
+                                <circle cx="19" cy="38" r="1.5" fill="#FFFFFF"/>
+                            </svg>
+                        </div>
+
+                        <!-- 떨어지는 단비 물방울들 -->
+                        <div class="water-drops-stream">
+                            <span class="water-drop drop-1">💧</span>
+                            <span class="water-drop drop-2">💧</span>
+                            <span class="water-drop drop-3">💧</span>
+                        </div>
+                    </div>
+
                     <div class="timer-digits" id="timer-display">25:00</div>
-                    <div class="timer-status-text" id="timer-status">준비 완료 • 씨앗이 기다리고 있어요</div>
+                    <div class="timer-status-text" id="timer-status">준비 완료 • 씨앗이 단비를 기다리고 있어요 🌱</div>
                 </div>
 
                 <!-- 타이머 제어 버튼 그룹 -->
@@ -159,7 +187,7 @@
                         <span class="card-tag">PLANT GROWTH</span>
                         <h2 class="card-title">성장 스토리</h2>
                     </div>
-                    <!-- [신규 기능] 성장 스토리 초기화 버튼 -->
+                    <!-- 성장 스토리 초기화 버튼 -->
                     <button type="button" class="btn-reset-growth" id="btn-reset-growth" title="오늘의 누적 시간을 초기화하고 새로운 씨앗부터 다시 시작합니다">
                         🔄 새 씨앗으로 리셋
                     </button>
